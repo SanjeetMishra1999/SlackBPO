@@ -89,7 +89,7 @@ export default SlackFunction(
 
     console.log("Row inserted successfully:", insertResponse);
     const result = `:tada: New record has been inserted.`;
-
+    console.log("...");
     return { outputs: { result } };
   },
 );
