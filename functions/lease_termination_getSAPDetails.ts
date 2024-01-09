@@ -20,6 +20,15 @@ export const GetSAPAddressFunctionDefinition = DefineFunction({
         type: Schema.slack.types.user_id,
         description: "The user invoking the workflow",
       },
+      accountName: {
+        type: Schema.types.string,
+      },
+      accountNumber: {
+        type: Schema.types.string,
+      },
+      address: {
+        type: Schema.types.string,
+      },
     },
     required: [],
   },
@@ -54,7 +63,7 @@ export default SlackFunction(
     const externalToken = auth.external_token;
     // Retrieve values from the spreadsheet
     const url =
-      `https://sheets.googleapis.com/v4/spreadsheets/1AfJKRG2BoBktbwzmgycZ4yYthuL7qgoUR3CjPBO6azw/values/A2:F2`;
+      `https://sheets.googleapis.com/v4/spreadsheets/1d9s8xrheV0qfkIM4zPmi11zfm_kDj0J8uXCx5NeL9UU/values/A2:D100`;
     const sheets = await fetch(url, {
       headers: {
         "Authorization": `Bearer ${externalToken}`,
@@ -69,15 +78,75 @@ export default SlackFunction(
     console.log(sheetsData);
     // Extract the relevant values from the response
     const values = sheetsData.values;
-    console.log(values);
+    console.log("values.length: ", values.length);
     if (!values || values.length === 0) {
       return { error: `No data found in the spreadsheet` };
     }
     console.log(values[0]);
-    const [text1, text2, text3] = values[0];
-    console.log(text1, "---", text2, "---", text3);
-    const sapAddress =
-      `:newspaper: Message for <@${inputs.user}>!\n\n>${sheetsData}`;
+    //Update Google Sheet
+    const rows = sheetsData.values || [];
+    console.log(rows);
+    // Find the index of the row with the specified contract number
+    const contractNumberToFind = inputs.contractNumber;
+    console.log(contractNumberToFind);
+    console.log("---------");
+    // Iterate through the data array to find the index
+    let foundIndex = -1;
+    for (let i = 0; i < sheetsData.values.length; i++) {
+      const rowData = sheetsData.values[i];
+      console.log("rowData: ", rowData);
+
+      // Assuming contract number is in the first column (index 0), adjust as needed
+      const contractNumberInRow = rowData[rowData.length - 1];
+      console.log("contractNumberInRow: ", contractNumberInRow);
+      console.log("i: ", i);
+      if (contractNumberInRow === contractNumberToFind) {
+        foundIndex = i;
+        break; // Exit the loop once a match is found
+      }
+    }
+
+    // Now foundIndex contains the index where the contract number matches
+    console.log("Index: " + foundIndex);
+    if (foundIndex === -1) {
+      return {
+        error: `Contract number ${contractNumberToFind} not found in the sheet`,
+      };
+    }
+
+    // Calculate the range dynamically based on the found index
+    const startRow = foundIndex + 2; // Adding 2 to convert to 1-based indexing
+    const sheetRange = `A${startRow}:D${startRow}`;
+
+    // Perform the update
+    const originalSheetName = "SAP - Account";
+    //const encodedSheetName = encodeURIComponent(originalSheetName);
+    //let encodedSheetName = originalSheetName.replace(/ /g, "%20");
+    const encodedSheetName = encodeURI(originalSheetName);
+    //const sheetRange = `A2:D2`;
+    const updateRequest = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/1d9s8xrheV0qfkIM4zPmi11zfm_kDj0J8uXCx5NeL9UU/values/${encodedSheetName}!${sheetRange}?valueInputOption=RAW`,
+      {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${externalToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          values: [[
+            inputs.accountName,
+            inputs.accountNumber,
+            inputs.address,
+            inputs.contractNumber,
+          ]],
+        }),
+      },
+    );
+
+    const updateResponse = await updateRequest.json();
+
+    console.log("Sheet updated successfully:", updateResponse);
+    const sapAddress = `:tada: SAP System has been updated.`;
 
     return { outputs: { sapAddress } };
   },

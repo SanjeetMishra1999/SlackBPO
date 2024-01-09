@@ -55,6 +55,10 @@ export const GetCaseDetailsFunctionDefinition = DefineFunction({
         type: Schema.types.string,
         description: "Salesforce Case Approval Notes",
       },
+      accountNum: {
+        type: Schema.types.string,
+        description: "Salesforce Case's Account Number",
+      },
     },
     required: [],
   },
@@ -77,8 +81,9 @@ export default SlackFunction(
     let comments = "";
     let approvalStatus = "";
     let approvalNotes = "";
+    let accountNum = "";
     const query =
-      `Select Id, CaseNumber, Account.Name, Billing_Address__c, Install_Address__c, Contract_Number__c, Case_Comments__c, Case_Approval_Status__c, Case_Approval_Notes__c From Case WHERE ID = '${caseId}' LIMIT 1`;
+      `Select Id, CaseNumber, Account.Name, Account.AccountNumber, Billing_Address__c, Install_Address__c, Contract_Number__c, Case_Comments__c, Case_Approval_Status__c, Case_Approval_Notes__c From Case WHERE ID = '${caseId}' LIMIT 1`;
 
     const salesforceUsername = "peterparker@slackpoc.com.fraudteam.rtxpoc";
     const salesforcePassword = "Accenture@12";
@@ -136,12 +141,12 @@ export default SlackFunction(
       console.log("Account Name:", accountName);
 
       billAddress = caseDetails[0].Billing_Address__c !== null
-        ? formatAddress(caseDetails[0].Billing_Address__c.toString())
+        ? formatAddress(caseDetails[0].Billing_Address__c).toString()
         : "";
       console.log("Billing Address:", billAddress);
 
       installAddress = caseDetails[0].Install_Address__c !== null
-        ? formatAddress(caseDetails[0].Install_Address__c.toString())
+        ? formatAddress(caseDetails[0].Install_Address__c).toString()
         : "";
       console.log("Installation Address:", installAddress);
 
@@ -164,6 +169,11 @@ export default SlackFunction(
         ? caseDetails[0].Case_Approval_Notes__c.toString()
         : "";
       console.log("Approval Notes:", approvalNotes);
+
+      accountNum = caseDetails[0].Account.AccountNumber !== null
+        ? caseDetails[0].Account.AccountNumber.toString()
+        : "";
+      console.log("Account Number:", accountNum);
     } catch (error) {
       console.error("Error:", error.message || error);
     }
@@ -179,6 +189,7 @@ export default SlackFunction(
         comments,
         approvalStatus,
         approvalNotes,
+        accountNum,
       },
     };
   },

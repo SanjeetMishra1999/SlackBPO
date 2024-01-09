@@ -3,6 +3,8 @@ import { SendCaseDetailsFunctionDefinition } from "./functions/lease_termination
 import { GetCaseDetailsFunctionDefinition } from "./functions/lease_termination_getCaseDetails.ts";
 import GoogleProvider from "./external_auth/google_provider.ts";
 import { GetSAPAddressFunctionDefinition } from "./functions/lease_termination_getSAPDetails.ts";
+import { UpdateCaseFunctionDefinition } from "./functions/lease_termination_updateCaseInSalesforce.ts";
+import { InsertRecordFunctionDefinition } from "./functions/lease_termination_createQuote.ts";
 /**
  * The app manifest contains the app's configuration. This
  * file defines attributes like app name and description.
@@ -17,6 +19,8 @@ export default Manifest({
     SendCaseDetailsFunctionDefinition,
     GetCaseDetailsFunctionDefinition,
     GetSAPAddressFunctionDefinition,
+    UpdateCaseFunctionDefinition,
+    InsertRecordFunctionDefinition,
   ],
   outgoingDomains: [
     "servcloud--rtxpoc.sandbox.my.salesforce.com",
