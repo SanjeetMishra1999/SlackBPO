@@ -2,9 +2,9 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 
 export const GetSAPAddressFunctionDefinition = DefineFunction({
-  callback_id: "get_sap_details",
-  title: "Get SAP Address",
-  description: "Get SAP Address",
+  callback_id: "get_update_sap_details",
+  title: "Get/Update SAP Address",
+  description: "Get/Update SAP Address",
   source_file: "functions/lease_termination_getSAPDetails.ts",
   input_parameters: {
     properties: {
@@ -46,6 +46,7 @@ export const GetSAPAddressFunctionDefinition = DefineFunction({
 export default SlackFunction(
   GetSAPAddressFunctionDefinition,
   async ({ inputs, client }) => {
+    // Need To Fix This
     console.log(inputs.user);
     // Collect employee information
     const user = await client.users.profile.get({ user: "U06CEEC3ZNG" });
@@ -112,6 +113,14 @@ export default SlackFunction(
       return {
         error: `Contract number ${contractNumberToFind} not found in the sheet`,
       };
+    }
+    const rowData = sheetsData.values[foundIndex];
+    const sapAddress = rowData[2];
+    console.log(sapAddress);
+
+    if (sapAddress === inputs.billingAddress) {
+      const addressMatched = ":tada: Address Match Successful.";
+      return { outputs: { addressMatched } };
     }
 
     // Calculate the range dynamically based on the found index

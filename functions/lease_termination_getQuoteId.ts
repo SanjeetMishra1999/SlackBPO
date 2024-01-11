@@ -111,6 +111,7 @@ export default SlackFunction(
     // Log the values to the console
     console.log("Values at the found index:", rowData);
     const quoteId = rowData[8];
+    //Need To Fix This
     console.log("QuoteId:", quoteId);
 
     return { outputs: { quoteId } };

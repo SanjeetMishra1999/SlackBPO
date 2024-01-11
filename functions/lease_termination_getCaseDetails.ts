@@ -2,8 +2,8 @@ import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 
 export const GetCaseDetailsFunctionDefinition = DefineFunction({
   callback_id: "get_case_details",
-  title: "Get Case Details",
-  description: "get Case Details",
+  title: "Get Case Details From Salesforce",
+  description: "Get Case Details From Salesforce",
   source_file: "functions/lease_termination_getCaseDetails.ts",
   input_parameters: {
     properties: {
@@ -50,7 +50,7 @@ export const GetCaseDetailsFunctionDefinition = DefineFunction({
       },
       accountNumber: {
         type: Schema.types.string,
-        description: "Salesforce Case's Account Number",
+        description: "Salesforce Case Account Number",
       },
     },
     required: [],
@@ -64,6 +64,7 @@ export default SlackFunction(
 
     const salesforceEndpoint =
       "https://servcloud--rtxpoc.sandbox.my.salesforce.com/services/data/v58.0/query?";
+
     const caseId = inputs.Id;
     let recordId = "";
     let caseNumber = "";
@@ -74,6 +75,7 @@ export default SlackFunction(
     let approvalStatus = "";
     let approvalNotes = "";
     let accountNumber = "";
+
     const query =
       `Select Id, CaseNumber, Account.Name, Account.AccountNumber, Case_Comments__c, Case_Approval_Status__c, Case_Approval_Notes__c, Billing_Street_2__c, Install_Street_2__c, Billing_Street_House_Number__c, Install_Street_House_Number__c, Billing_Postal_Code_City__c, Install_Postal_Code_City__c, Billing_Country__c, Install_Country__c, Billing_Region__c, Install_Region__c, Billing_Time_Zone__c, Install_Time_Zone__c, Billing_Tax_Jurisdiction__c, Install_Tax_Jurisdiction__c From Case WHERE ID = '${caseId}' LIMIT 1`;
 
@@ -81,6 +83,7 @@ export default SlackFunction(
     const salesforcePassword = "Accenture@12";
     const salesforceSecurityToken = "ED2a16SzrZcKwr4ht0LRTBRW";
     const apiUrl = `${salesforceEndpoint}q=${encodeURIComponent(query)}`;
+
     const authEndpoint =
       "https://servcloud--rtxpoc.sandbox.my.salesforce.com/services/oauth2/token";
 

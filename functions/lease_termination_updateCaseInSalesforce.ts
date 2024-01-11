@@ -3,7 +3,7 @@ import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 export const UpdateCaseFunctionDefinition = DefineFunction({
   callback_id: "update_case_in_Salesforce",
   title: "Update Case In Salesforce",
-  description: "Update Salesforce Case",
+  description: "Update Case In Salesforce",
   source_file: "functions/lease_termination_updateCaseInSalesforce.ts",
   input_parameters: {
     properties: {
@@ -13,7 +13,7 @@ export const UpdateCaseFunctionDefinition = DefineFunction({
       },
       comments: {
         type: Schema.types.string,
-        description: "New comments for the Case",
+        description: "Comment for the Case",
       },
       status: {
         type: Schema.types.string,
