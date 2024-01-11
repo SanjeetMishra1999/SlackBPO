@@ -11,19 +11,16 @@ export const GetCaseDetailsFunctionDefinition = DefineFunction({
         type: Schema.types.string,
         description: "Salesforce Case Id",
       },
-      channel: {
-        type: Schema.slack.types.channel_id,
-      },
     },
-    required: ["Id", "channel"],
+    required: ["Id"],
   },
   output_parameters: {
     properties: {
-      result: {
+      recordId: {
         type: Schema.types.string,
         description: "Salesforce Case Id",
       },
-      caseNum: {
+      caseNumber: {
         type: Schema.types.string,
         description: "Salesforce Case Number",
       },
@@ -31,7 +28,7 @@ export const GetCaseDetailsFunctionDefinition = DefineFunction({
         type: Schema.types.string,
         description: "Salesforce Case Account Name",
       },
-      billAddress: {
+      billingAddress: {
         type: Schema.types.string,
         description: "Salesforce Case Billing Address",
       },
@@ -39,11 +36,7 @@ export const GetCaseDetailsFunctionDefinition = DefineFunction({
         type: Schema.types.string,
         description: "Salesforce Case Install Address",
       },
-      contractNum: {
-        type: Schema.types.string,
-        description: "Salesforce Case Contract Number",
-      },
-      comments: {
+      caseComments: {
         type: Schema.types.string,
         description: "Salesforce Case Comments",
       },
@@ -55,7 +48,7 @@ export const GetCaseDetailsFunctionDefinition = DefineFunction({
         type: Schema.types.string,
         description: "Salesforce Case Approval Notes",
       },
-      accountNum: {
+      accountNumber: {
         type: Schema.types.string,
         description: "Salesforce Case's Account Number",
       },
@@ -67,23 +60,23 @@ export const GetCaseDetailsFunctionDefinition = DefineFunction({
 export default SlackFunction(
   GetCaseDetailsFunctionDefinition,
   async ({ inputs }) => {
-    const { Id, channel } = inputs;
+    const { Id } = inputs;
 
     const salesforceEndpoint =
       "https://servcloud--rtxpoc.sandbox.my.salesforce.com/services/data/v58.0/query?";
     const caseId = inputs.Id;
-    let result = "We hit a snag.";
-    let caseNum = "";
+    let recordId = "";
+    let caseNumber = "";
     let accountName = "";
-    let billAddress = "";
+    let billingAddress = "";
     let installAddress = "";
-    let contractNum = "";
-    let comments = "";
+    let contractNumber = "";
+    let caseComments = "";
     let approvalStatus = "";
     let approvalNotes = "";
-    let accountNum = "";
+    let accountNumber = "";
     const query =
-      `Select Id, CaseNumber, Account.Name, Account.AccountNumber, Billing_Address__c, Install_Address__c, Contract_Number__c, Case_Comments__c, Case_Approval_Status__c, Case_Approval_Notes__c From Case WHERE ID = '${caseId}' LIMIT 1`;
+      `Select Id, CaseNumber, Account.Name, Account.AccountNumber, Contract_Number__c, Case_Comments__c, Case_Approval_Status__c, Case_Approval_Notes__c, Billing_Street_2__c, Install_Street_2__c, Billing_Street_House_Number__c, Install_Street_House_Number__c, Billing_Postal_Code_City__c, Install_Postal_Code_City__c, Billing_Country__c, Install_Country__c, Billing_Region__c, Install_Region__c, Billing_Time_Zone__c, Install_Time_Zone__c, Billing_Tax_Jurisdiction__c, Install_Tax_Jurisdiction__c From Case WHERE ID = '${caseId}' LIMIT 1`;
 
     const salesforceUsername = "peterparker@slackpoc.com.fraudteam.rtxpoc";
     const salesforcePassword = "Accenture@12";
@@ -127,38 +120,28 @@ export default SlackFunction(
 
       const caseDetails = apiData.records;
 
-      result = caseDetails[0].Id !== null ? caseDetails[0].Id.toString() : "";
-      console.log("Result:", result);
+      recordId = caseDetails[0].Id !== null ? caseDetails[0].Id.toString() : "";
+      console.log("Result:", recordId);
 
-      caseNum = caseDetails[0].CaseNumber !== null
+      caseNumber = caseDetails[0].CaseNumber !== null
         ? caseDetails[0].CaseNumber.toString()
         : "";
-      console.log("Case Number:", caseNum);
+      console.log("Case Number:", caseNumber);
 
       accountName = caseDetails[0].Account.Name !== null
         ? caseDetails[0].Account.Name.toString()
         : "";
       console.log("Account Name:", accountName);
 
-      billAddress = caseDetails[0].Billing_Address__c !== null
-        ? formatAddress(caseDetails[0].Billing_Address__c).toString()
-        : "";
-      console.log("Billing Address:", billAddress);
-
-      installAddress = caseDetails[0].Install_Address__c !== null
-        ? formatAddress(caseDetails[0].Install_Address__c).toString()
-        : "";
-      console.log("Installation Address:", installAddress);
-
-      contractNum = caseDetails[0].Contract_Number__c !== null
+      contractNumber = caseDetails[0].Contract_Number__c !== null
         ? caseDetails[0].Contract_Number__c.toString()
         : "";
-      console.log("Contract Number:", contractNum);
+      console.log("Contract Number:", contractNumber);
 
-      comments = caseDetails[0].Case_Comments__c !== null
+      caseComments = caseDetails[0].Case_Comments__c !== null
         ? caseDetails[0].Case_Comments__c.toString()
         : "";
-      console.log("Comments:", comments);
+      console.log("Comments:", caseComments);
 
       approvalStatus = caseDetails[0].Case_Approval_Status__c !== null
         ? caseDetails[0].Case_Approval_Status__c.toString()
@@ -170,40 +153,45 @@ export default SlackFunction(
         : "";
       console.log("Approval Notes:", approvalNotes);
 
-      accountNum = caseDetails[0].Account.AccountNumber !== null
+      accountNumber = caseDetails[0].Account.AccountNumber !== null
         ? caseDetails[0].Account.AccountNumber.toString()
         : "";
-      console.log("Account Number:", accountNum);
+      console.log("Account Number:", accountNumber);
+
+      billingAddress = caseDetails[0].Billing_Street_2__c + ", " +
+        caseDetails[0].Billing_Street_House_Number__c + ", " +
+        caseDetails[0].Billing_Postal_Code_City__c + ", " +
+        caseDetails[0].Billing_Country__c + ", " +
+        caseDetails[0].Billing_Region__c + ", " +
+        caseDetails[0].Billing_Time_Zone__c + ", " +
+        caseDetails[0].Billing_Tax_Jurisdiction__c;
+      console.log("Billing Address:", billingAddress);
+
+      installAddress = caseDetails[0].Install_Street_2__c + ", " +
+        caseDetails[0].Install_Street_House_Number__c + ", " +
+        caseDetails[0].Install_Postal_Code_City__c + ", " +
+        caseDetails[0].Install_Country__c + ", " +
+        caseDetails[0].Install_Region__c + ", " +
+        caseDetails[0].Install_Time_Zone__c + ", " +
+        caseDetails[0].Install_Tax_Jurisdiction__c;
+      console.log("Installation Address:", installAddress);
     } catch (error) {
       console.error("Error:", error.message || error);
     }
 
     return {
       outputs: {
-        result,
-        caseNum,
+        recordId,
+        caseNumber,
         accountName,
-        billAddress,
+        billingAddress,
         installAddress,
-        contractNum,
-        comments,
+        contractNumber,
+        caseComments,
         approvalStatus,
         approvalNotes,
-        accountNum,
+        accountNumber,
       },
     };
   },
 );
-
-interface Address {
-  city: string;
-  country: string;
-  state: string;
-  street: string | null;
-}
-
-function formatAddress(address: Address) {
-  return `${address.street ?? ""}${
-    address.street ? ", " : ""
-  }${address.city}, ${address.state}, ${address.country}`;
-}
