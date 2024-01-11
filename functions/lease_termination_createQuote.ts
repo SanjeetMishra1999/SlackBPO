@@ -27,6 +27,21 @@ export const InsertRecordFunctionDefinition = DefineFunction({
         type: Schema.types.string,
         description: "New Contract Number",
       },
+      operatingUnit: {
+        type: Schema.types.string,
+      },
+      effectiveFrom: {
+        type: Schema.types.string,
+      },
+      quoteType: {
+        type: Schema.types.string,
+      },
+      quoteReason: {
+        type: Schema.types.string,
+      },
+      comments: {
+        type: Schema.types.string,
+      },
     },
     required: [
       "googleAccessTokenId",
@@ -76,10 +91,14 @@ export default SlackFunction(
         },
         body: JSON.stringify({
           values: [[
-            inputs.accountName,
             inputs.accountNumber,
-            inputs.address,
+            inputs.operatingUnit,
             inputs.contractNumber,
+            inputs.quoteType,
+            inputs.quoteReason,
+            inputs.comments,
+            inputs.effectiveFrom,
+            "Accepted",
           ]],
         }),
       },
@@ -88,7 +107,7 @@ export default SlackFunction(
     const insertResponse = await insertRequest.json();
 
     console.log("Row inserted successfully:", insertResponse);
-    const result = `:tada: New record has been inserted.`;
+    const result = `:tada: Quote Created Successfully.`;
     console.log("...");
     return { outputs: { result } };
   },

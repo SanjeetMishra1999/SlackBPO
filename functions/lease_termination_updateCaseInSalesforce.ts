@@ -15,8 +15,14 @@ export const UpdateCaseFunctionDefinition = DefineFunction({
         type: Schema.types.string,
         description: "New comments for the Case",
       },
+      status: {
+        type: Schema.types.string,
+      },
+      quoteId: {
+        type: Schema.types.string,
+      },
     },
-    required: ["Id", "comments"],
+    required: ["Id"],
   },
   output_parameters: {
     properties: {
@@ -32,7 +38,7 @@ export const UpdateCaseFunctionDefinition = DefineFunction({
 export default SlackFunction(
   UpdateCaseFunctionDefinition,
   async ({ inputs }) => {
-    const { Id, comments } = inputs;
+    const { Id, comments, status } = inputs;
 
     const salesforceEndpoint =
       "https://servcloud--rtxpoc.sandbox.my.salesforce.com/services/data/v58.0/sobjects/Case/";
@@ -79,11 +85,16 @@ export default SlackFunction(
         },
         body: JSON.stringify({
           Case_Comments__c: comments,
+          Status: inputs.status,
+          Case_Approval__c: true,
+          Case_Approval_Status__c: "Approved",
+          Case_Approval_Notes__c: comments,
+          Termination_Quote_Id__c: inputs.quoteId,
         }),
       });
 
       if (updateResponse.ok) {
-        result = "Case Comments updated successfully.";
+        result = "Case updated successfully.";
       }
     } catch (error) {
       console.error("Error:", error.message || error);

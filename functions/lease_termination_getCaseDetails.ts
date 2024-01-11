@@ -152,22 +152,22 @@ export default SlackFunction(
         : "";
       console.log("Account Number:", accountNumber);
 
-      billingAddress = caseDetails[0].Billing_Street_2__c + ", " +
+      billingAddress = (caseDetails[0].Billing_Street_2__c + ", " +
         caseDetails[0].Billing_Street_House_Number__c + ", " +
         caseDetails[0].Billing_Postal_Code_City__c + ", " +
         caseDetails[0].Billing_Country__c + ", " +
         caseDetails[0].Billing_Region__c + ", " +
         caseDetails[0].Billing_Time_Zone__c + ", " +
-        caseDetails[0].Billing_Tax_Jurisdiction__c;
+        caseDetails[0].Billing_Tax_Jurisdiction__c).toString();
       console.log("Billing Address:", billingAddress);
 
-      installAddress = caseDetails[0].Install_Street_2__c + ", " +
+      installAddress = (caseDetails[0].Install_Street_2__c + ", " +
         caseDetails[0].Install_Street_House_Number__c + ", " +
         caseDetails[0].Install_Postal_Code_City__c + ", " +
         caseDetails[0].Install_Country__c + ", " +
         caseDetails[0].Install_Region__c + ", " +
         caseDetails[0].Install_Time_Zone__c + ", " +
-        caseDetails[0].Install_Tax_Jurisdiction__c;
+        caseDetails[0].Install_Tax_Jurisdiction__c).toString();
       console.log("Installation Address:", installAddress);
     } catch (error) {
       console.error("Error:", error.message || error);

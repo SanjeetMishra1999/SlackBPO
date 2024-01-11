@@ -119,14 +119,14 @@ export default SlackFunction(
     const balance = rowData[4];
     console.log("Balance:", balance);
 
-    if (balance !== 0) {
+    if (balance !== "0") {
       return {
         error: `Not eligible for Lease Termination`,
       };
     }
 
-    const sapResult = `:tada: Selected account has no outstanding invoices.`;
+    const result = `:tada: Selected account has no outstanding invoices.`;
 
-    return { outputs: { sapResult } };
+    return { outputs: { result } };
   },
 );

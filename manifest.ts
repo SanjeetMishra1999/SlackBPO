@@ -6,6 +6,7 @@ import { GetSAPAddressFunctionDefinition } from "./functions/lease_termination_g
 import { UpdateCaseFunctionDefinition } from "./functions/lease_termination_updateCaseInSalesforce.ts";
 import { InsertRecordFunctionDefinition } from "./functions/lease_termination_createQuote.ts";
 import { CheckBalanceFunctionDefinition } from "./functions/lease_termination_checkRemainingBalance.ts";
+import { GetQuoteIdFunctionDefinition } from "./functions/lease_termination_getQuoteId.ts";
 /**
  * The app manifest contains the app's configuration. This
  * file defines attributes like app name and description.
@@ -23,6 +24,7 @@ export default Manifest({
     UpdateCaseFunctionDefinition,
     InsertRecordFunctionDefinition,
     CheckBalanceFunctionDefinition,
+    GetQuoteIdFunctionDefinition,
   ],
   outgoingDomains: [
     "servcloud--rtxpoc.sandbox.my.salesforce.com",

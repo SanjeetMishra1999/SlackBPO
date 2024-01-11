@@ -1,11 +1,11 @@
 // functions/sample_function.ts
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 
-export const GetSAPAddressFunctionDefinition = DefineFunction({
-  callback_id: "get_sap_details",
-  title: "Get SAP Address",
-  description: "Get SAP Address",
-  source_file: "functions/lease_termination_getSAPDetails.ts",
+export const GetQuoteIdFunctionDefinition = DefineFunction({
+  callback_id: "get_quote_id",
+  title: "Get Quote Id",
+  description: "Get Quote Id",
+  source_file: "functions/lease_termination_getQuoteId.ts",
   input_parameters: {
     properties: {
       contractNumber: {
@@ -20,31 +20,21 @@ export const GetSAPAddressFunctionDefinition = DefineFunction({
         type: Schema.slack.types.user_id,
         description: "The user invoking the workflow",
       },
-      accountName: {
-        type: Schema.types.string,
-      },
-      accountNumber: {
-        type: Schema.types.string,
-      },
-      billingAddress: {
-        type: Schema.types.string,
-      },
     },
     required: [],
   },
   output_parameters: {
     properties: {
-      sapUpdateResult: {
+      quoteId: {
         type: Schema.types.string,
-        description: "SAP Update Result",
       },
     },
-    required: ["sapUpdateResult"],
+    required: ["quoteId"],
   },
 });
 
 export default SlackFunction(
-  GetSAPAddressFunctionDefinition,
+  GetQuoteIdFunctionDefinition,
   async ({ inputs, client }) => {
     console.log(inputs.user);
     // Collect employee information
@@ -60,10 +50,13 @@ export default SlackFunction(
     if (!auth.ok) {
       return { error: `Failed to collect Google auth token: ${auth.error}` };
     }
+    const sheetName = "OLFM - TQ Creation";
+    const encodedSheetName = encodeURI(sheetName);
+
     const externalToken = auth.external_token;
     // Retrieve values from the spreadsheet
     const url =
-      `https://sheets.googleapis.com/v4/spreadsheets/1d9s8xrheV0qfkIM4zPmi11zfm_kDj0J8uXCx5NeL9UU/values/A2:D100`;
+      `https://sheets.googleapis.com/v4/spreadsheets/1voRjJSMymavuPnxCp5t5Atx5BHDBlLNH3KCTw4HHOI0/values/${encodedSheetName}!A2:Q100`;
     const sheets = await fetch(url, {
       headers: {
         "Authorization": `Bearer ${externalToken}`,
@@ -113,41 +106,13 @@ export default SlackFunction(
         error: `Contract number ${contractNumberToFind} not found in the sheet`,
       };
     }
+    // Get the values of the row at the found index
+    const rowData = sheetsData.values[foundIndex];
+    // Log the values to the console
+    console.log("Values at the found index:", rowData);
+    const quoteId = rowData[8];
+    console.log("QuoteId:", quoteId);
 
-    // Calculate the range dynamically based on the found index
-    const startRow = foundIndex + 2; // Adding 2 to convert to 1-based indexing
-    const sheetRange = `A${startRow}:D${startRow}`;
-
-    // Perform the update
-    const originalSheetName = "SAP - Account";
-    //const encodedSheetName = encodeURIComponent(originalSheetName);
-    //let encodedSheetName = originalSheetName.replace(/ /g, "%20");
-    const encodedSheetName = encodeURI(originalSheetName);
-    //const sheetRange = `A2:D2`;
-    const updateRequest = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/1d9s8xrheV0qfkIM4zPmi11zfm_kDj0J8uXCx5NeL9UU/values/${encodedSheetName}!${sheetRange}?valueInputOption=RAW`,
-      {
-        method: "PUT",
-        headers: {
-          "Authorization": `Bearer ${externalToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          values: [[
-            inputs.accountName,
-            inputs.accountNumber,
-            inputs.billingAddress,
-            inputs.contractNumber,
-          ]],
-        }),
-      },
-    );
-
-    const updateResponse = await updateRequest.json();
-
-    console.log("Sheet updated successfully:", updateResponse);
-    const sapUpdateResult = `:tada: SAP System has been updated.`;
-
-    return { outputs: { sapUpdateResult } };
+    return { outputs: { quoteId } };
   },
 );
