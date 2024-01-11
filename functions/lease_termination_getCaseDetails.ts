@@ -70,13 +70,12 @@ export default SlackFunction(
     let accountName = "";
     let billingAddress = "";
     let installAddress = "";
-    let contractNumber = "";
     let caseComments = "";
     let approvalStatus = "";
     let approvalNotes = "";
     let accountNumber = "";
     const query =
-      `Select Id, CaseNumber, Account.Name, Account.AccountNumber, Contract_Number__c, Case_Comments__c, Case_Approval_Status__c, Case_Approval_Notes__c, Billing_Street_2__c, Install_Street_2__c, Billing_Street_House_Number__c, Install_Street_House_Number__c, Billing_Postal_Code_City__c, Install_Postal_Code_City__c, Billing_Country__c, Install_Country__c, Billing_Region__c, Install_Region__c, Billing_Time_Zone__c, Install_Time_Zone__c, Billing_Tax_Jurisdiction__c, Install_Tax_Jurisdiction__c From Case WHERE ID = '${caseId}' LIMIT 1`;
+      `Select Id, CaseNumber, Account.Name, Account.AccountNumber, Case_Comments__c, Case_Approval_Status__c, Case_Approval_Notes__c, Billing_Street_2__c, Install_Street_2__c, Billing_Street_House_Number__c, Install_Street_House_Number__c, Billing_Postal_Code_City__c, Install_Postal_Code_City__c, Billing_Country__c, Install_Country__c, Billing_Region__c, Install_Region__c, Billing_Time_Zone__c, Install_Time_Zone__c, Billing_Tax_Jurisdiction__c, Install_Tax_Jurisdiction__c From Case WHERE ID = '${caseId}' LIMIT 1`;
 
     const salesforceUsername = "peterparker@slackpoc.com.fraudteam.rtxpoc";
     const salesforcePassword = "Accenture@12";
@@ -133,11 +132,6 @@ export default SlackFunction(
         : "";
       console.log("Account Name:", accountName);
 
-      contractNumber = caseDetails[0].Contract_Number__c !== null
-        ? caseDetails[0].Contract_Number__c.toString()
-        : "";
-      console.log("Contract Number:", contractNumber);
-
       caseComments = caseDetails[0].Case_Comments__c !== null
         ? caseDetails[0].Case_Comments__c.toString()
         : "";
@@ -186,7 +180,6 @@ export default SlackFunction(
         accountName,
         billingAddress,
         installAddress,
-        contractNumber,
         caseComments,
         approvalStatus,
         approvalNotes,
