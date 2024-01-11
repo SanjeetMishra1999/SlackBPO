@@ -90,7 +90,7 @@ export default SlackFunction(
       console.log("rowData: ", rowData);
 
       // Assuming contract number is in the first column (index 0), adjust as needed
-      const contractNumberInRow = rowData[rowData.length - 1];
+      const contractNumberInRow = rowData[2];
       console.log("contractNumberInRow: ", contractNumberInRow);
       console.log("i: ", i);
       if (contractNumberInRow === contractNumberToFind) {
