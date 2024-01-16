@@ -1,6 +1,7 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 import { googleSheetURLToGetSAPData } from "./lease_termination_Constants.ts";
 import { googleSheetSAPAccount } from "./lease_termination_Constants.ts";
+import { rowDataIndexForSAPAddress } from "./lease_termination_Constants.ts";
 
 export const GetSAPAddressFunctionDefinition = DefineFunction({
   callback_id: "get_update_sap_details",
@@ -106,7 +107,7 @@ export default SlackFunction(
       };
     }
     const rowData = sheetsData.values[foundIndex];
-    const sapAddress = rowData[2];
+    const sapAddress = rowData[rowDataIndexForSAPAddress];
     console.log(`SAP Address in Google Sheet: `, sapAddress);
 
     if (sapAddress === inputs.billingAddress) {

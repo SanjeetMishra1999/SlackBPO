@@ -17,3 +17,4 @@ export const googleSheetOLFMAccount = "OLFM - Account";
 export const googleSheetOLFMTQCreation = "OLFM - TQ Creation";
 export const salesforceEndpointURLForCaseUpdate =
   "https://servcloud--rtxpoc.sandbox.my.salesforce.com/services/data/v58.0/sobjects/Case/";
+export const rowDataIndexForSAPAddress = 2;
