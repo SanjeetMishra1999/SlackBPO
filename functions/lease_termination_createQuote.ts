@@ -1,5 +1,7 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 import { googleSheetOLFMTQCreation } from "./lease_termination_Constants.ts";
+import { googleSheetGeneralURL } from "./lease_termination_Constants.ts";
+import { googleSheetInvoiceID } from "./lease_termination_Constants.ts";
 
 export const InsertRecordFunctionDefinition = DefineFunction({
   callback_id: "insert_quote_record",
@@ -88,7 +90,7 @@ export default SlackFunction(
     // Perform the insert
     const encodedSheetName = encodeURI(googleSheetOLFMTQCreation);
     const url =
-      `https://sheets.googleapis.com/v4/spreadsheets/1voRjJSMymavuPnxCp5t5Atx5BHDBlLNH3KCTw4HHOI0/values/${encodedSheetName}!A2:Q100`;
+      `${googleSheetGeneralURL}${googleSheetInvoiceID}/values/${encodedSheetName}!A2:Q100`;
     const sheets = await fetch(url, {
       headers: {
         "Authorization": `Bearer ${externalToken}`,
@@ -109,7 +111,7 @@ export default SlackFunction(
     const sheetRange = `A${firstEmptyRow}:I${firstEmptyRow}`;
     const quoteId = Number(inputs.caseNumber) + 1;
     const insertRequest = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/1voRjJSMymavuPnxCp5t5Atx5BHDBlLNH3KCTw4HHOI0/values/${encodedSheetName}!${sheetRange}?valueInputOption=RAW`,
+      `${googleSheetGeneralURL}${googleSheetInvoiceID}/values/${encodedSheetName}!${sheetRange}?valueInputOption=RAW`,
       {
         method: "PUT",
         headers: {

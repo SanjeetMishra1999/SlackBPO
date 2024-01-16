@@ -2,6 +2,7 @@ import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 import { googleSheetURLToGetSAPData } from "./lease_termination_Constants.ts";
 import { googleSheetSAPAccount } from "./lease_termination_Constants.ts";
 import { rowDataIndexForSAPAddress } from "./lease_termination_Constants.ts";
+import { googleSheetSAPID } from "./lease_termination_Constants.ts";
 
 export const GetSAPAddressFunctionDefinition = DefineFunction({
   callback_id: "get_update_sap_details",
@@ -123,7 +124,7 @@ export default SlackFunction(
     // Perform the update
     const encodedSheetName = encodeURI(googleSheetSAPAccount);
     const updateRequest = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/1d9s8xrheV0qfkIM4zPmi11zfm_kDj0J8uXCx5NeL9UU/values/${encodedSheetName}!${sheetRange}?valueInputOption=RAW`,
+      `https://sheets.googleapis.com/v4/spreadsheets/${googleSheetSAPID}/values/${encodedSheetName}!${sheetRange}?valueInputOption=RAW`,
       {
         method: "PUT",
         headers: {

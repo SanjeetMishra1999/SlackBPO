@@ -18,3 +18,8 @@ export const googleSheetOLFMTQCreation = "OLFM - TQ Creation";
 export const salesforceEndpointURLForCaseUpdate =
   "https://servcloud--rtxpoc.sandbox.my.salesforce.com/services/data/v58.0/sobjects/Case/";
 export const rowDataIndexForSAPAddress = 2;
+export const googleSheetSAPID = "1d9s8xrheV0qfkIM4zPmi11zfm_kDj0J8uXCx5NeL9UU";
+export const googleSheetInvoiceID =
+  "1voRjJSMymavuPnxCp5t5Atx5BHDBlLNH3KCTw4HHOI0";
+export const googleSheetGeneralURL =
+  "https://sheets.googleapis.com/v4/spreadsheets/";

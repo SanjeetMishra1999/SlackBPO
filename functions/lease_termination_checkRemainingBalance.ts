@@ -1,5 +1,7 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 import { googleSheetOLFMAccount } from "./lease_termination_Constants.ts";
+import { googleSheetInvoiceID } from "./lease_termination_Constants.ts";
+import { googleSheetGeneralURL } from "./lease_termination_Constants.ts";
 
 export const CheckBalanceFunctionDefinition = DefineFunction({
   callback_id: "check_remaining_balance",
@@ -65,7 +67,7 @@ export default SlackFunction(
     const externalToken = auth.external_token;
     // Retrieve values from the spreadsheet
     const url =
-      `https://sheets.googleapis.com/v4/spreadsheets/1voRjJSMymavuPnxCp5t5Atx5BHDBlLNH3KCTw4HHOI0/values/${encodedSheetName}!A2:Q100`;
+      `${googleSheetGeneralURL}${googleSheetInvoiceID}/values/${encodedSheetName}!A2:Q100`;
     const sheets = await fetch(url, {
       headers: {
         "Authorization": `Bearer ${externalToken}`,
