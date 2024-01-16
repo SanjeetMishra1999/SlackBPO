@@ -1,26 +1,26 @@
 import { DefineOAuth2Provider, Schema } from "deno-slack-sdk/mod.ts";
+import * as CONST_VALUE from "../functions/lease_termination_Constants.ts";
 
 const GoogleProvider = DefineOAuth2Provider({
   provider_key: "google-slack-bpo",
   provider_type: Schema.providers.oauth2.CUSTOM,
   options: {
     "provider_name": "Google",
-    "authorization_url": "https://accounts.google.com/o/oauth2/auth",
-    "token_url": "https://oauth2.googleapis.com/token",
-    "client_id":
-      "164328133269-81d2hu0avu90jji63db1pgeluvhsh2m2.apps.googleusercontent.com",
+    "authorization_url": CONST_VALUE.googleAccountAuth,
+    "token_url": CONST_VALUE.googleAccountToken,
+    "client_id": CONST_VALUE.googleClientId,
     "scope": [
-      "https://www.googleapis.com/auth/spreadsheets",
-      "https://www.googleapis.com/auth/userinfo.email",
-      "https://www.googleapis.com/auth/spreadsheets.readonly",
-      "https://www.googleapis.com/auth/userinfo.profile",
+      CONST_VALUE.spreadsheetScope1,
+      CONST_VALUE.spreadsheetScope2,
+      CONST_VALUE.spreadsheetScope3,
+      CONST_VALUE.spreadsheetScope4,
     ],
     "authorization_url_extras": {
       "prompt": "consent",
       "access_type": "offline",
     },
     "identity_config": {
-      "url": "https://www.googleapis.com/oauth2/v1/userinfo",
+      "url": CONST_VALUE.googleInfoURL,
       "account_identifier": "$.email",
     },
   },

@@ -32,3 +32,15 @@ export const rowDataIndexForBalance = 4;
 export const salesforceQuery =
   "Select Id, CaseNumber, Account.Name, Account.AccountNumber, Case_Comments__c, Case_Approval_Status__c, Case_Approval_Notes__c, Billing_Street_2__c, Install_Street_2__c, Billing_Street_House_Number__c, Install_Street_House_Number__c, Billing_Postal_Code_City__c, Install_Postal_Code_City__c, Billing_Country__c, Install_Country__c, Billing_Region__c, Install_Region__c, Billing_Time_Zone__c, Install_Time_Zone__c, Billing_Tax_Jurisdiction__c, Install_Tax_Jurisdiction__c From Case WHERE ID = ";
 export const salesforceCaseUpdated = ":tada: Case updated successfully.";
+export const spreadsheetScope1 = "https://www.googleapis.com/auth/spreadsheets";
+export const spreadsheetScope2 =
+  "https://www.googleapis.com/auth/userinfo.email";
+export const spreadsheetScope3 =
+  "https://www.googleapis.com/auth/spreadsheets.readonly";
+export const spreadsheetScope4 =
+  "https://www.googleapis.com/auth/userinfo.profile";
+export const googleInfoURL = "https://www.googleapis.com/oauth2/v1/userinfo";
+export const googleAccountAuth = "https://accounts.google.com/o/oauth2/auth";
+export const googleAccountToken = "https://oauth2.googleapis.com/token";
+export const googleClientId =
+  "164328133269-81d2hu0avu90jji63db1pgeluvhsh2m2.apps.googleusercontent.com";
