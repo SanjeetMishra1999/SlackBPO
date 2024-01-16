@@ -1,6 +1,12 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 import { salesforceUsername } from "./lease_termination_Constants.ts";
 import { salesforceAuthEndpoint } from "./lease_termination_Constants.ts";
+import { salesforceEndpointURLForCaseUpdate } from "./lease_termination_Constants.ts";
+import { salesforcePassword } from "./lease_termination_Constants.ts";
+import { salesforceSecurityToken } from "./lease_termination_Constants.ts";
+import { salesforceGrantType } from "./lease_termination_Constants.ts";
+import { salesforceClientId } from "./lease_termination_Constants.ts";
+import { salesforceClientSecret } from "./lease_termination_Constants.ts";
 
 export const UpdateCaseFunctionDefinition = DefineFunction({
   callback_id: "update_case_in_Salesforce",
@@ -43,19 +49,12 @@ export const UpdateCaseFunctionDefinition = DefineFunction({
 export default SlackFunction(
   UpdateCaseFunctionDefinition,
   async ({ inputs }) => {
-    const salesforceEndpoint =
-      "https://servcloud--rtxpoc.sandbox.my.salesforce.com/services/data/v58.0/sobjects/Case/";
-    const caseId = inputs.Id;
-    const updateEndpoint = `${salesforceEndpoint}${caseId}`;
+    const updateEndpoint = `${salesforceEndpointURLForCaseUpdate}${inputs.Id}`;
     let result = "Failed to update Case Comments.";
-    const salesforcePassword = "Accenture@12";
-    const salesforceSecurityToken = "ED2a16SzrZcKwr4ht0LRTBRW";
     const authPayload = {
-      grant_type: "password",
-      client_id:
-        "3MVG9eQyYZ1h89Hdsszwpgu_2PL32EX4LJhifNN27jPEBg0wcXfDjwmE6K3wRquzKjJWcT4x8mbEaWYNdKIyq",
-      client_secret:
-        "77949EA34C3ED4DE6EF21A5585CA628B62CD63C2A37039FCABB4910D192A7509",
+      grant_type: salesforceGrantType,
+      client_id: salesforceClientId,
+      client_secret: salesforceClientSecret,
       username: `${salesforceUsername}`,
       password: `${salesforcePassword}${salesforceSecurityToken}`,
     };
