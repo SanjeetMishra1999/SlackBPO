@@ -1,7 +1,5 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
-import { googleSheetOLFMAccount } from "./lease_termination_Constants.ts";
-import { googleSheetInvoiceID } from "./lease_termination_Constants.ts";
-import { googleSheetGeneralURL } from "./lease_termination_Constants.ts";
+import * as CONST_VALUE from "./lease_termination_Constants.ts";
 
 export const CheckBalanceFunctionDefinition = DefineFunction({
   callback_id: "check_remaining_balance",
@@ -63,11 +61,11 @@ export default SlackFunction(
           `We hit a snag. Failed to collect Google auth token: ${auth.error}`,
       };
     }
-    const encodedSheetName = encodeURI(googleSheetOLFMAccount);
+    const encodedSheetName = encodeURI(CONST_VALUE.googleSheetOLFMAccount);
     const externalToken = auth.external_token;
     // Retrieve values from the spreadsheet
     const url =
-      `${googleSheetGeneralURL}${googleSheetInvoiceID}/values/${encodedSheetName}!A2:Q100`;
+      `${CONST_VALUE.googleSheetGeneralURL}${CONST_VALUE.googleSheetInvoiceID}/values/${encodedSheetName}!${CONST_VALUE.googleSheetBalanceRange}`;
     const sheets = await fetch(url, {
       headers: {
         "Authorization": `Bearer ${externalToken}`,
@@ -117,7 +115,7 @@ export default SlackFunction(
     const rowData = sheetsData.values[foundIndex];
     // Log the values to the console
     console.log("Values at the found index:", rowData);
-    const balance = rowData[4];
+    const balance = rowData[CONST_VALUE.rowDataIndexForBalance];
     console.log("Balance: ", balance);
 
     if (balance !== "0") {

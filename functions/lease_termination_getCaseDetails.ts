@@ -1,12 +1,5 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
-import { salesforceEndpointURL } from "./lease_termination_Constants.ts";
-import { salesforceAuthEndpoint } from "./lease_termination_Constants.ts";
-import { salesforceGrantType } from "./lease_termination_Constants.ts";
-import { salesforceClientId } from "./lease_termination_Constants.ts";
-import { salesforceUsername } from "./lease_termination_Constants.ts";
-import { salesforcePassword } from "./lease_termination_Constants.ts";
-import { salesforceSecurityToken } from "./lease_termination_Constants.ts";
-import { salesforceClientSecret } from "./lease_termination_Constants.ts";
+import * as CONST_VALUE from "./lease_termination_Constants.ts";
 
 export const GetCaseDetailsFunctionDefinition = DefineFunction({
   callback_id: "get_case_details",
@@ -77,19 +70,19 @@ export default SlackFunction(
     let approvalStatus = "";
     let approvalNotes = "";
     let accountNumber = "";
-    const query =
-      `Select Id, CaseNumber, Account.Name, Account.AccountNumber, Case_Comments__c, Case_Approval_Status__c, Case_Approval_Notes__c, Billing_Street_2__c, Install_Street_2__c, Billing_Street_House_Number__c, Install_Street_House_Number__c, Billing_Postal_Code_City__c, Install_Postal_Code_City__c, Billing_Country__c, Install_Country__c, Billing_Region__c, Install_Region__c, Billing_Time_Zone__c, Install_Time_Zone__c, Billing_Tax_Jurisdiction__c, Install_Tax_Jurisdiction__c From Case WHERE ID = '${inputs.Id}' LIMIT 1`;
+    const query = `${CONST_VALUE.salesforceQuery}${inputs.Id} LIMIT 1`;
 
     const authPayload = {
-      grant_type: salesforceGrantType,
-      client_id: salesforceClientId,
-      client_secret: salesforceClientSecret,
-      username: `${salesforceUsername}`,
-      password: `${salesforcePassword}${salesforceSecurityToken}`,
+      grant_type: CONST_VALUE.salesforceGrantType,
+      client_id: CONST_VALUE.salesforceClientId,
+      client_secret: CONST_VALUE.salesforceClientSecret,
+      username: `${CONST_VALUE.salesforceUsername}`,
+      password:
+        `${CONST_VALUE.salesforcePassword}${CONST_VALUE.salesforceSecurityToken}`,
     };
 
     try {
-      const authResponse = await fetch(salesforceAuthEndpoint, {
+      const authResponse = await fetch(CONST_VALUE.salesforceAuthEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -101,7 +94,9 @@ export default SlackFunction(
       console.log(`AUTH DATA: `, authData);
 
       const accessToken = authData.access_token;
-      const apiUrl = `${salesforceEndpointURL}q=${encodeURIComponent(query)}`;
+      const apiUrl = `${CONST_VALUE.salesforceEndpointURL}q=${
+        encodeURIComponent(query)
+      }`;
 
       const apiResponse = await fetch(apiUrl, {
         headers: {

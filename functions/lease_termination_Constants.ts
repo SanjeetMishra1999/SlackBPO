@@ -23,3 +23,12 @@ export const googleSheetInvoiceID =
   "1voRjJSMymavuPnxCp5t5Atx5BHDBlLNH3KCTw4HHOI0";
 export const googleSheetGeneralURL =
   "https://sheets.googleapis.com/v4/spreadsheets/";
+export const addressMatchedSuccessInSAP =
+  ":tada: Address Matched Successfully. Please Continue. :slightly_smiling_face:";
+export const addressUpdatedInSAP =
+  ":tada: SAP System has been updated. Please Continue. :slightly_smiling_face:";
+export const googleSheetBalanceRange = "A2:Q1000";
+export const rowDataIndexForBalance = 4;
+export const salesforceQuery =
+  "Select Id, CaseNumber, Account.Name, Account.AccountNumber, Case_Comments__c, Case_Approval_Status__c, Case_Approval_Notes__c, Billing_Street_2__c, Install_Street_2__c, Billing_Street_House_Number__c, Install_Street_House_Number__c, Billing_Postal_Code_City__c, Install_Postal_Code_City__c, Billing_Country__c, Install_Country__c, Billing_Region__c, Install_Region__c, Billing_Time_Zone__c, Install_Time_Zone__c, Billing_Tax_Jurisdiction__c, Install_Tax_Jurisdiction__c From Case WHERE ID = ";
+export const salesforceCaseUpdated = ":tada: Case updated successfully.";

@@ -1,8 +1,5 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
-import { googleSheetURLToGetSAPData } from "./lease_termination_Constants.ts";
-import { googleSheetSAPAccount } from "./lease_termination_Constants.ts";
-import { rowDataIndexForSAPAddress } from "./lease_termination_Constants.ts";
-import { googleSheetSAPID } from "./lease_termination_Constants.ts";
+import * as CONST_VALUE from "./lease_termination_Constants.ts";
 
 export const GetSAPAddressFunctionDefinition = DefineFunction({
   callback_id: "get_update_sap_details",
@@ -65,7 +62,7 @@ export default SlackFunction(
           `We hit a sag. Failed to collect Google auth token: ${auth.error}`,
       };
     }
-    const sheets = await fetch(googleSheetURLToGetSAPData, {
+    const sheets = await fetch(CONST_VALUE.googleSheetURLToGetSAPData, {
       headers: {
         "Authorization": `Bearer ${auth.external_token}`,
       },
@@ -108,12 +105,11 @@ export default SlackFunction(
       };
     }
     const rowData = sheetsData.values[foundIndex];
-    const sapAddress = rowData[rowDataIndexForSAPAddress];
+    const sapAddress = rowData[CONST_VALUE.rowDataIndexForSAPAddress];
     console.log(`SAP Address in Google Sheet: `, sapAddress);
 
     if (sapAddress === inputs.billingAddress) {
-      const sapUpdateResult =
-        ":tada: Address Matched Successfully. Please Continue. :slightly_smiling_face:";
+      const sapUpdateResult = CONST_VALUE.addressMatchedSuccessInSAP;
       return { outputs: { sapUpdateResult } };
     }
 
@@ -122,9 +118,9 @@ export default SlackFunction(
     const sheetRange = `A${startRow}:D${startRow}`;
 
     // Perform the update
-    const encodedSheetName = encodeURI(googleSheetSAPAccount);
+    const encodedSheetName = encodeURI(CONST_VALUE.googleSheetSAPAccount);
     const updateRequest = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${googleSheetSAPID}/values/${encodedSheetName}!${sheetRange}?valueInputOption=RAW`,
+      `${CONST_VALUE.googleSheetGeneralURL}${CONST_VALUE.googleSheetSAPID}/values/${encodedSheetName}!${sheetRange}?valueInputOption=RAW`,
       {
         method: "PUT",
         headers: {
@@ -145,8 +141,7 @@ export default SlackFunction(
     const updateResponse = await updateRequest.json();
 
     console.log("Sheet updated successfully:", updateResponse);
-    const sapUpdateResult =
-      `:tada: SAP System has been updated. Please Continue. :slightly_smiling_face:`;
+    const sapUpdateResult = CONST_VALUE.addressUpdatedInSAP;
     return { outputs: { sapUpdateResult } };
   },
 );

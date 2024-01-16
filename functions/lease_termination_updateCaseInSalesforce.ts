@@ -1,12 +1,5 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
-import { salesforceUsername } from "./lease_termination_Constants.ts";
-import { salesforceAuthEndpoint } from "./lease_termination_Constants.ts";
-import { salesforceEndpointURLForCaseUpdate } from "./lease_termination_Constants.ts";
-import { salesforcePassword } from "./lease_termination_Constants.ts";
-import { salesforceSecurityToken } from "./lease_termination_Constants.ts";
-import { salesforceGrantType } from "./lease_termination_Constants.ts";
-import { salesforceClientId } from "./lease_termination_Constants.ts";
-import { salesforceClientSecret } from "./lease_termination_Constants.ts";
+import * as CONST_VALUE from "./lease_termination_Constants.ts";
 
 export const UpdateCaseFunctionDefinition = DefineFunction({
   callback_id: "update_case_in_Salesforce",
@@ -49,19 +42,21 @@ export const UpdateCaseFunctionDefinition = DefineFunction({
 export default SlackFunction(
   UpdateCaseFunctionDefinition,
   async ({ inputs }) => {
-    const updateEndpoint = `${salesforceEndpointURLForCaseUpdate}${inputs.Id}`;
+    const updateEndpoint =
+      `${CONST_VALUE.salesforceEndpointURLForCaseUpdate}${inputs.Id}`;
     let result = "Failed to update Case Comments.";
     const authPayload = {
-      grant_type: salesforceGrantType,
-      client_id: salesforceClientId,
-      client_secret: salesforceClientSecret,
-      username: `${salesforceUsername}`,
-      password: `${salesforcePassword}${salesforceSecurityToken}`,
+      grant_type: CONST_VALUE.salesforceGrantType,
+      client_id: CONST_VALUE.salesforceClientId,
+      client_secret: CONST_VALUE.salesforceClientSecret,
+      username: `${CONST_VALUE.salesforceUsername}`,
+      password:
+        `${CONST_VALUE.salesforcePassword}${CONST_VALUE.salesforceSecurityToken}`,
     };
 
     try {
       // Authenticate and get the access token
-      const authResponse = await fetch(salesforceAuthEndpoint, {
+      const authResponse = await fetch(CONST_VALUE.salesforceAuthEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -91,7 +86,7 @@ export default SlackFunction(
       });
 
       if (updateResponse.ok) {
-        result = ":tada: Case updated successfully.";
+        result = CONST_VALUE.salesforceCaseUpdated;
       }
     } catch (error) {
       console.error("Error:", error.message || error);
