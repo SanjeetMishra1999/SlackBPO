@@ -1,4 +1,5 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
+import { googleSheetOLFMTQCreation } from "./lease_termination_Constants.ts";
 
 export const InsertRecordFunctionDefinition = DefineFunction({
   callback_id: "insert_quote_record",
@@ -42,13 +43,16 @@ export const InsertRecordFunctionDefinition = DefineFunction({
       comments: {
         type: Schema.types.string,
       },
+      caseNumber: {
+        type: Schema.types.string,
+      },
     },
     required: [
-      "googleAccessTokenId",
-      "accountName",
-      "accountNumber",
-      "address",
-      "contractNumber",
+      "operatingUnit",
+      "effectiveFrom",
+      "quoteType",
+      "quoteReason",
+      "comments",
     ],
   },
   output_parameters: {
@@ -56,6 +60,9 @@ export const InsertRecordFunctionDefinition = DefineFunction({
       result: {
         type: Schema.types.string,
         description: "Insert result",
+      },
+      quoteId: {
+        type: Schema.types.string,
       },
     },
     required: [],
@@ -71,16 +78,36 @@ export default SlackFunction(
     });
 
     if (!auth.ok) {
-      return { error: `Failed to collect Google auth token: ${auth.error}` };
+      return {
+        error:
+          `We hit a snag. Failed to collect Google auth token: ${auth.error}`,
+      };
     }
     const externalToken = auth.external_token;
     // Calculate the range for the new row
-    const sheetRange = `A2:I2`;
-
     // Perform the insert
-    const originalSheetName = "OLFM - TQ Creation";
-    const encodedSheetName = encodeURI(originalSheetName);
-
+    const encodedSheetName = encodeURI(googleSheetOLFMTQCreation);
+    const url =
+      `https://sheets.googleapis.com/v4/spreadsheets/1voRjJSMymavuPnxCp5t5Atx5BHDBlLNH3KCTw4HHOI0/values/${encodedSheetName}!A2:Q100`;
+    const sheets = await fetch(url, {
+      headers: {
+        "Authorization": `Bearer ${externalToken}`,
+      },
+    });
+    if (!sheets.ok) {
+      return {
+        error:
+          `We hit a snag. Failed to retrieve sheet data: ${sheets.statusText}`,
+      };
+    }
+    const sheetsData = await sheets.json();
+    console.log(`Sheet Data: `, sheetsData);
+    // Extract the relevant values from the response
+    const values = sheetsData.values;
+    console.log("values.length: ", values.length);
+    const firstEmptyRow = values.length + 2;
+    const sheetRange = `A${firstEmptyRow}:I${firstEmptyRow}`;
+    const quoteId = Number(inputs.caseNumber) + 1;
     const insertRequest = await fetch(
       `https://sheets.googleapis.com/v4/spreadsheets/1voRjJSMymavuPnxCp5t5Atx5BHDBlLNH3KCTw4HHOI0/values/${encodedSheetName}!${sheetRange}?valueInputOption=RAW`,
       {
@@ -99,16 +126,24 @@ export default SlackFunction(
             inputs.comments,
             inputs.effectiveFrom,
             "Accepted",
+            Number(inputs.caseNumber) + 1,
           ]],
         }),
       },
     );
-
+    console.log(`insertRequest: `, insertRequest);
+    if (!insertRequest.ok) {
+      return {
+        error: `We hit a snag. Error: ${insertRequest.statusText}`,
+      };
+    }
     const insertResponse = await insertRequest.json();
 
     console.log("Row inserted successfully:", insertResponse);
-    const result = `:tada: Quote Created Successfully.`;
-    console.log("...");
-    return { outputs: { result } };
+    const result =
+      `:tada: Termination Quote Created Successfully with Termination Quote Id: ${
+        Number(inputs.caseNumber) + 1
+      }.`;
+    return { outputs: { result, quoteId } };
   },
 );

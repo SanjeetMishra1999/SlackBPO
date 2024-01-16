@@ -1,5 +1,6 @@
-// functions/sample_function.ts
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
+import { googleSheetURLToGetSAPData } from "./lease_termination_Constants.ts";
+import { googleSheetSAPAccount } from "./lease_termination_Constants.ts";
 
 export const GetSAPAddressFunctionDefinition = DefineFunction({
   callback_id: "get_update_sap_details",
@@ -9,7 +10,7 @@ export const GetSAPAddressFunctionDefinition = DefineFunction({
   input_parameters: {
     properties: {
       contractNumber: {
-        type: Schema.types.string,
+        type: Schema.types.number,
         description: "Contract Number",
       },
       googleAccessTokenId: {
@@ -30,7 +31,7 @@ export const GetSAPAddressFunctionDefinition = DefineFunction({
         type: Schema.types.string,
       },
     },
-    required: [],
+    required: ["contractNumber"],
   },
   output_parameters: {
     properties: {
@@ -46,81 +47,72 @@ export const GetSAPAddressFunctionDefinition = DefineFunction({
 export default SlackFunction(
   GetSAPAddressFunctionDefinition,
   async ({ inputs, client }) => {
-    // Need To Fix This
-    console.log(inputs.user);
-    // Collect employee information
-    const user = await client.users.profile.get({ user: "U06CEEC3ZNG" });
+    const user = await client.users.profile.get({ user: inputs.user });
     if (!user.ok) {
-      return { error: `Failed to gather user profile: ${user.error}` };
+      return {
+        error: `We hit a snag. Failed to gather user profile: ${user.error}`,
+      };
     }
-    // Collect Google access token
     const auth = await client.apps.auth.external.get({
       external_token_id: inputs.googleAccessTokenId,
     });
 
     if (!auth.ok) {
-      return { error: `Failed to collect Google auth token: ${auth.error}` };
+      return {
+        error:
+          `We hit a sag. Failed to collect Google auth token: ${auth.error}`,
+      };
     }
-    const externalToken = auth.external_token;
-    // Retrieve values from the spreadsheet
-    const url =
-      `https://sheets.googleapis.com/v4/spreadsheets/1d9s8xrheV0qfkIM4zPmi11zfm_kDj0J8uXCx5NeL9UU/values/A2:D100`;
-    const sheets = await fetch(url, {
+    const sheets = await fetch(googleSheetURLToGetSAPData, {
       headers: {
-        "Authorization": `Bearer ${externalToken}`,
+        "Authorization": `Bearer ${auth.external_token}`,
       },
     });
     if (!sheets.ok) {
       return {
-        error: `Failed to retrieve sheet data: ${sheets.statusText}`,
+        error:
+          `We hit a snag. Failed to retrieve sheet data: ${sheets.statusText}`,
       };
     }
     const sheetsData = await sheets.json();
-    console.log(sheetsData);
+    console.log(`SHEET DATA: `, sheetsData);
     // Extract the relevant values from the response
-    const values = sheetsData.values;
-    console.log("values.length: ", values.length);
-    if (!values || values.length === 0) {
-      return { error: `No data found in the spreadsheet` };
+    console.log("Values.Length: ", sheetsData.values.length);
+    if (!sheetsData.values || sheetsData.values.length === 0) {
+      return { error: `We hit a snag. No data found in the spreadsheet` };
     }
-    console.log(values[0]);
     //Update Google Sheet
     const rows = sheetsData.values || [];
-    console.log(rows);
+    console.log(`ROWS: `, rows);
     // Find the index of the row with the specified contract number
-    const contractNumberToFind = inputs.contractNumber;
-    console.log(contractNumberToFind);
-    console.log("---------");
     // Iterate through the data array to find the index
     let foundIndex = -1;
     for (let i = 0; i < sheetsData.values.length; i++) {
       const rowData = sheetsData.values[i];
-      console.log("rowData: ", rowData);
-
-      // Assuming contract number is in the first column (index 0), adjust as needed
-      const contractNumberInRow = rowData[rowData.length - 1];
-      console.log("contractNumberInRow: ", contractNumberInRow);
-      console.log("i: ", i);
-      if (contractNumberInRow === contractNumberToFind) {
+      console.log("RowData: ", rowData);
+      // Contract number is in the first column (index 0)
+      if (rowData[rowData.length - 1] === inputs.contractNumber.toString()) {
         foundIndex = i;
         break; // Exit the loop once a match is found
       }
     }
 
     // Now foundIndex contains the index where the contract number matches
-    console.log("Index: " + foundIndex);
+    console.log("Found Index: " + foundIndex);
     if (foundIndex === -1) {
       return {
-        error: `Contract number ${contractNumberToFind} not found in the sheet`,
+        error:
+          `We hit a snag. Contract number ${inputs.contractNumber} not found in the sheet`,
       };
     }
     const rowData = sheetsData.values[foundIndex];
     const sapAddress = rowData[2];
-    console.log(sapAddress);
+    console.log(`SAP Address in Google Sheet: `, sapAddress);
 
     if (sapAddress === inputs.billingAddress) {
-      const addressMatched = ":tada: Address Match Successful.";
-      return { outputs: { addressMatched } };
+      const sapUpdateResult =
+        ":tada: Address Matched Successfully. Please Continue. :slightly_smiling_face:";
+      return { outputs: { sapUpdateResult } };
     }
 
     // Calculate the range dynamically based on the found index
@@ -128,17 +120,13 @@ export default SlackFunction(
     const sheetRange = `A${startRow}:D${startRow}`;
 
     // Perform the update
-    const originalSheetName = "SAP - Account";
-    //const encodedSheetName = encodeURIComponent(originalSheetName);
-    //let encodedSheetName = originalSheetName.replace(/ /g, "%20");
-    const encodedSheetName = encodeURI(originalSheetName);
-    //const sheetRange = `A2:D2`;
+    const encodedSheetName = encodeURI(googleSheetSAPAccount);
     const updateRequest = await fetch(
       `https://sheets.googleapis.com/v4/spreadsheets/1d9s8xrheV0qfkIM4zPmi11zfm_kDj0J8uXCx5NeL9UU/values/${encodedSheetName}!${sheetRange}?valueInputOption=RAW`,
       {
         method: "PUT",
         headers: {
-          "Authorization": `Bearer ${externalToken}`,
+          "Authorization": `Bearer ${auth.external_token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -155,8 +143,8 @@ export default SlackFunction(
     const updateResponse = await updateRequest.json();
 
     console.log("Sheet updated successfully:", updateResponse);
-    const sapUpdateResult = `:tada: SAP System has been updated.`;
-
+    const sapUpdateResult =
+      `:tada: SAP System has been updated. Please Continue. :slightly_smiling_face:`;
     return { outputs: { sapUpdateResult } };
   },
 );

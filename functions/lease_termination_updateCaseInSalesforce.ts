@@ -1,4 +1,6 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
+import { salesforceUsername } from "./lease_termination_Constants.ts";
+import { salesforceAuthEndpoint } from "./lease_termination_Constants.ts";
 
 export const UpdateCaseFunctionDefinition = DefineFunction({
   callback_id: "update_case_in_Salesforce",
@@ -21,6 +23,9 @@ export const UpdateCaseFunctionDefinition = DefineFunction({
       quoteId: {
         type: Schema.types.string,
       },
+      contractNumber: {
+        type: Schema.types.string,
+      },
     },
     required: ["Id"],
   },
@@ -38,21 +43,13 @@ export const UpdateCaseFunctionDefinition = DefineFunction({
 export default SlackFunction(
   UpdateCaseFunctionDefinition,
   async ({ inputs }) => {
-    const { Id, comments, status } = inputs;
-
     const salesforceEndpoint =
       "https://servcloud--rtxpoc.sandbox.my.salesforce.com/services/data/v58.0/sobjects/Case/";
     const caseId = inputs.Id;
     const updateEndpoint = `${salesforceEndpoint}${caseId}`;
     let result = "Failed to update Case Comments.";
-
-    const salesforceUsername = "peterparker@slackpoc.com.fraudteam.rtxpoc";
     const salesforcePassword = "Accenture@12";
     const salesforceSecurityToken = "ED2a16SzrZcKwr4ht0LRTBRW";
-
-    const authEndpoint =
-      "https://servcloud--rtxpoc.sandbox.my.salesforce.com/services/oauth2/token";
-
     const authPayload = {
       grant_type: "password",
       client_id:
@@ -65,7 +62,7 @@ export default SlackFunction(
 
     try {
       // Authenticate and get the access token
-      const authResponse = await fetch(authEndpoint, {
+      const authResponse = await fetch(salesforceAuthEndpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -84,17 +81,18 @@ export default SlackFunction(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Case_Comments__c: comments,
+          Case_Comments__c: inputs.comments,
           Status: inputs.status,
           Case_Approval__c: true,
-          Case_Approval_Status__c: "Approved",
-          Case_Approval_Notes__c: comments,
+          Case_Approval_Status__c: inputs.status,
+          Case_Approval_Notes__c: inputs.comments,
           Termination_Quote_Id__c: inputs.quoteId,
+          Contract_Number__c: inputs.contractNumber,
         }),
       });
 
       if (updateResponse.ok) {
-        result = "Case updated successfully.";
+        result = ":tada: Case updated successfully.";
       }
     } catch (error) {
       console.error("Error:", error.message || error);

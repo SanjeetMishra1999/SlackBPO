@@ -1,4 +1,5 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
+import { googleSheetOLFMAccount } from "./lease_termination_Constants.ts";
 
 export const CheckBalanceFunctionDefinition = DefineFunction({
   callback_id: "check_remaining_balance",
@@ -26,7 +27,7 @@ export const CheckBalanceFunctionDefinition = DefineFunction({
         type: Schema.types.string,
       },
     },
-    required: [],
+    required: ["contractNumber"],
   },
   output_parameters: {
     properties: {
@@ -42,11 +43,12 @@ export const CheckBalanceFunctionDefinition = DefineFunction({
 export default SlackFunction(
   CheckBalanceFunctionDefinition,
   async ({ inputs, client }) => {
-    console.log(inputs.user);
     // Collect employee information
-    const user = await client.users.profile.get({ user: "U06CEEC3ZNG" });
+    const user = await client.users.profile.get({ user: inputs.user });
     if (!user.ok) {
-      return { error: `Failed to gather user profile: ${user.error}` };
+      return {
+        error: `We hit a snag. Failed to gather user profile: ${user.error}`,
+      };
     }
     // Collect Google access token
     const auth = await client.apps.auth.external.get({
@@ -54,11 +56,12 @@ export default SlackFunction(
     });
 
     if (!auth.ok) {
-      return { error: `Failed to collect Google auth token: ${auth.error}` };
+      return {
+        error:
+          `We hit a snag. Failed to collect Google auth token: ${auth.error}`,
+      };
     }
-    const sheetName = "OLFM - Account";
-    const encodedSheetName = encodeURI(sheetName);
-
+    const encodedSheetName = encodeURI(googleSheetOLFMAccount);
     const externalToken = auth.external_token;
     // Retrieve values from the spreadsheet
     const url =
@@ -70,46 +73,42 @@ export default SlackFunction(
     });
     if (!sheets.ok) {
       return {
-        error: `Failed to retrieve sheet data: ${sheets.statusText}`,
+        error:
+          `We hit a snag. Failed to retrieve sheet data: ${sheets.statusText}`,
       };
     }
     const sheetsData = await sheets.json();
-    console.log(sheetsData);
+    console.log(`Sheet Data: `, sheetsData);
     // Extract the relevant values from the response
     const values = sheetsData.values;
     console.log("values.length: ", values.length);
     if (!values || values.length === 0) {
-      return { error: `No data found in the spreadsheet` };
+      return { error: `We hit a snag. No data found in the spreadsheet` };
     }
-    console.log(values[0]);
     //Update Google Sheet
     const rows = sheetsData.values || [];
-    console.log(rows);
+    console.log(`Rows: `, rows);
     // Find the index of the row with the specified contract number
-    const contractNumberToFind = inputs.contractNumber;
-    console.log(contractNumberToFind);
-    console.log("---------");
     // Iterate through the data array to find the index
     let foundIndex = -1;
     for (let i = 0; i < sheetsData.values.length; i++) {
       const rowData = sheetsData.values[i];
       console.log("rowData: ", rowData);
 
-      // Assuming contract number is in the first column (index 0), adjust as needed
+      // Contract number is in the first column (index 0)
       const contractNumberInRow = rowData[rowData.length - 1];
-      console.log("contractNumberInRow: ", contractNumberInRow);
-      console.log("i: ", i);
-      if (contractNumberInRow === contractNumberToFind) {
+      if (contractNumberInRow === inputs.contractNumber.toString()) {
         foundIndex = i;
         break; // Exit the loop once a match is found
       }
     }
 
     // Now foundIndex contains the index where the contract number matches
-    console.log("Index: " + foundIndex);
+    console.log("Found Index: " + foundIndex);
     if (foundIndex === -1) {
       return {
-        error: `Contract number ${contractNumberToFind} not found in the sheet`,
+        error:
+          `We hit a snag. Contract number ${inputs.contractNumber} not found in the sheet`,
       };
     }
     // Get the values of the row at the found index
@@ -117,16 +116,17 @@ export default SlackFunction(
     // Log the values to the console
     console.log("Values at the found index:", rowData);
     const balance = rowData[4];
-    console.log("Balance:", balance);
+    console.log("Balance: ", balance);
 
     if (balance !== "0") {
       return {
-        error: `Not eligible for Lease Termination`,
+        error:
+          `We hit a snag. Case not eligible for Lease Termination due to ${balance} outstanding invoices.`,
       };
     }
 
-    const result = `:tada: Selected account has no outstanding invoices.`;
-
+    const result =
+      `:tada: Selected account (Contract Number: ${inputs.contractNumber}) has no outstanding invoices. Please continue with creating Lease Termination Quote. :slightly_smiling_face:`;
     return { outputs: { result } };
   },
 );

@@ -20,6 +20,9 @@ export const GetQuoteIdFunctionDefinition = DefineFunction({
         type: Schema.slack.types.user_id,
         description: "The user invoking the workflow",
       },
+      caseNumber: {
+        type: Schema.types.string,
+      },
     },
     required: [],
   },
@@ -36,9 +39,8 @@ export const GetQuoteIdFunctionDefinition = DefineFunction({
 export default SlackFunction(
   GetQuoteIdFunctionDefinition,
   async ({ inputs, client }) => {
-    console.log(inputs.user);
     // Collect employee information
-    const user = await client.users.profile.get({ user: "U06CEEC3ZNG" });
+    const user = await client.users.profile.get({ user: inputs.user });
     if (!user.ok) {
       return { error: `Failed to gather user profile: ${user.error}` };
     }
@@ -75,7 +77,6 @@ export default SlackFunction(
     if (!values || values.length === 0) {
       return { error: `No data found in the spreadsheet` };
     }
-    console.log(values[0]);
     //Update Google Sheet
     const rows = sheetsData.values || [];
     console.log(rows);
