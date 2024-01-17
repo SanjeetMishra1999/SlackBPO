@@ -16,8 +16,8 @@ const GoogleProvider = DefineOAuth2Provider({
       CONST_VALUE.spreadsheetScope4,
     ],
     "authorization_url_extras": {
-      "prompt": "consent",
-      "access_type": "offline",
+      "prompt": CONST_VALUE.googleSheetPrompt,
+      "access_type": CONST_VALUE.googleSheetAccessType,
     },
     "identity_config": {
       "url": CONST_VALUE.googleInfoURL,

@@ -44,3 +44,5 @@ export const googleAccountAuth = "https://accounts.google.com/o/oauth2/auth";
 export const googleAccountToken = "https://oauth2.googleapis.com/token";
 export const googleClientId =
   "164328133269-81d2hu0avu90jji63db1pgeluvhsh2m2.apps.googleusercontent.com";
+export const googleSheetAccessType = "offline";
+export const googleSheetPrompt = "consent";
