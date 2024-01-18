@@ -94,9 +94,14 @@ export default SlackFunction(
     for (let i = 0; i < sheetsData.values.length; i++) {
       const rowData = sheetsData.values[i];
       console.log("rowData: ", rowData);
-
+      console.log("rowData.length: ", rowData.length);
       // Contract number is in the first column (index 0)
-      const contractNumberInRow = rowData[rowData.length - 1];
+      const contractNumberInRow = rowData[9];
+      console.log("contractNumberInRow: ", contractNumberInRow);
+      console.log(
+        "inputs.contractNumber.toString(): ",
+        inputs.contractNumber.toString(),
+      );
       if (contractNumberInRow === inputs.contractNumber.toString()) {
         foundIndex = i;
         break; // Exit the loop once a match is found

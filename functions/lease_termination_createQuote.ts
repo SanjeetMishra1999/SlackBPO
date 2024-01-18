@@ -104,8 +104,14 @@ export default SlackFunction(
     console.log(`Sheet Data: `, sheetsData);
     // Extract the relevant values from the response
     const values = sheetsData.values;
-    console.log("values.length: ", values.length);
-    const firstEmptyRow = values.length + 2;
+    console.log("values: ", values);
+    let firstEmptyRow = 2;
+    if (!values || values.length === 0) {
+      firstEmptyRow = 2;
+    } else {
+      console.log("values.length: ", values.length);
+      firstEmptyRow = values.length + 2;
+    }
     const sheetRange = `A${firstEmptyRow}:I${firstEmptyRow}`;
     const quoteId = Number(inputs.caseNumber) + 1;
     const insertRequest = await fetch(

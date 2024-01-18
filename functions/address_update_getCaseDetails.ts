@@ -1,10 +1,10 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 import * as CONST_VALUE from "./lease_termination_Constants.ts";
 
-export const GetCaseDetailsFunctionDefinition = DefineFunction({
-  callback_id: "get_case_details",
-  title: "Get Case Details From Salesforce",
-  description: "Get Case Details From Salesforce",
+export const GetCaseDetailFunctionDefinition = DefineFunction({
+  callback_id: "get_case_details2",
+  title: "Get Case Details From Salesforce 2",
+  description: "Get Case Details From Salesforce 2",
   source_file: "functions/lease_termination_getCaseDetails.ts",
   input_parameters: {
     properties: {
@@ -53,13 +53,55 @@ export const GetCaseDetailsFunctionDefinition = DefineFunction({
         type: Schema.types.string,
         description: "Salesforce Case Account Number",
       },
+      billingStreet2: {
+        type: Schema.types.string,
+      },
+      billingStreetHouseNumber: {
+        type: Schema.types.string,
+      },
+      billingPostalCode: {
+        type: Schema.types.string,
+      },
+      billingCountry: {
+        type: Schema.types.string,
+      },
+      billingRegion: {
+        type: Schema.types.string,
+      },
+      billingTimeZone: {
+        type: Schema.types.string,
+      },
+      billingTaxJurisdiction: {
+        type: Schema.types.string,
+      },
+      installStreet2: {
+        type: Schema.types.string,
+      },
+      installStreetHouseNumber: {
+        type: Schema.types.string,
+      },
+      installPostalCode: {
+        type: Schema.types.string,
+      },
+      installCountry: {
+        type: Schema.types.string,
+      },
+      installRegion: {
+        type: Schema.types.string,
+      },
+      installTimeZone: {
+        type: Schema.types.string,
+      },
+      installTaxJurisdiction: {
+        type: Schema.types.string,
+      },
     },
     required: [],
   },
 });
 
 export default SlackFunction(
-  GetCaseDetailsFunctionDefinition,
+  GetCaseDetailFunctionDefinition,
   async ({ inputs }) => {
     let recordId = "";
     let caseNumber = "";
@@ -70,6 +112,20 @@ export default SlackFunction(
     let approvalStatus = "";
     let approvalNotes = "";
     let accountNumber = "";
+    let billingStreet2 = "";
+    let billingStreetHouseNumber = "";
+    let billingPostalCode = "";
+    let billingCountry = "";
+    let billingRegion = "";
+    let billingTimeZone = "";
+    let billingTaxJurisdiction;
+    let installStreet2 = "";
+    let installStreetHouseNumber = "";
+    let installPostalCode = "";
+    let installCountry = "";
+    let installRegion = "";
+    let installTimeZone = "";
+    let installTaxJurisdiction = "";
     const query = `${CONST_VALUE.salesforceQuery}'${inputs.Id}' LIMIT 1`;
     console.log("Query: ", query);
     const authPayload = {
@@ -151,6 +207,20 @@ export default SlackFunction(
         caseDetails[0].Install_Time_Zone__c + ", " +
         caseDetails[0].Install_Tax_Jurisdiction__c).toString();
       console.log("Installation Address:", installAddress);
+      billingStreet2 = caseDetails[0].Billing_Street_2__c;
+      billingStreetHouseNumber = caseDetails[0].Billing_Street_House_Number__c;
+      billingPostalCode = caseDetails[0].Billing_Postal_Code_City__c;
+      billingCountry = caseDetails[0].Billing_Country__c;
+      billingRegion = caseDetails[0].Billing_Region__c;
+      billingTimeZone = caseDetails[0].Billing_Time_Zone__c;
+      billingTaxJurisdiction = caseDetails[0].Billing_Tax_Jurisdiction__c;
+      installStreet2 = caseDetails[0].Install_Street_2__c;
+      installStreetHouseNumber = caseDetails[0].Install_Street_House_Number__c;
+      installPostalCode = caseDetails[0].Install_Postal_Code_City__c;
+      installCountry = caseDetails[0].Install_Country__c;
+      installRegion = caseDetails[0].Install_Region__c;
+      installTimeZone = caseDetails[0].Install_Time_Zone__c;
+      installTaxJurisdiction = caseDetails[0].Install_Tax_Jurisdiction__c;
     } catch (error) {
       console.error("We hit a snag. Error: ", error.message || error);
     }
