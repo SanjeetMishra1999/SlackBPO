@@ -221,6 +221,7 @@ export default SlackFunction(
       installRegion = caseDetails[0].Install_Region__c;
       installTimeZone = caseDetails[0].Install_Time_Zone__c;
       installTaxJurisdiction = caseDetails[0].Install_Tax_Jurisdiction__c;
+      console.log("installTaxJurisdiction: ", installTaxJurisdiction);
     } catch (error) {
       console.error("We hit a snag. Error: ", error.message || error);
     }
