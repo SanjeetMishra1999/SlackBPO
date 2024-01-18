@@ -207,6 +207,7 @@ export default SlackFunction(
         caseDetails[0].Install_Time_Zone__c + ", " +
         caseDetails[0].Install_Tax_Jurisdiction__c).toString();
       console.log("Installation Address:", installAddress);
+      console.log("----------------------");
       billingStreet2 = caseDetails[0].Billing_Street_2__c;
       billingStreetHouseNumber = caseDetails[0].Billing_Street_House_Number__c;
       billingPostalCode = caseDetails[0].Billing_Postal_Code_City__c;
@@ -221,7 +222,9 @@ export default SlackFunction(
       installRegion = caseDetails[0].Install_Region__c;
       installTimeZone = caseDetails[0].Install_Time_Zone__c;
       installTaxJurisdiction = caseDetails[0].Install_Tax_Jurisdiction__c;
+      console.log("----------------------");
       console.log("installTaxJurisdiction: ", installTaxJurisdiction);
+      console.log("----------------------");
     } catch (error) {
       console.error("We hit a snag. Error: ", error.message || error);
     }
