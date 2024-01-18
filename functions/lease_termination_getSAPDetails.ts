@@ -107,7 +107,6 @@ export default SlackFunction(
     const rowData = sheetsData.values[foundIndex];
     const sapAddress = rowData[CONST_VALUE.rowDataIndexForSAPAddress];
     console.log(`SAP Address in Google Sheet: `, sapAddress);
-
     if (sapAddress === inputs.billingAddress) {
       const sapUpdateResult = CONST_VALUE.addressMatchedSuccessInSAP;
       return { outputs: { sapUpdateResult } };

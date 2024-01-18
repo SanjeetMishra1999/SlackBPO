@@ -53,6 +53,9 @@ export const GetCaseDetailsFunctionDefinition = DefineFunction({
         type: Schema.types.string,
         description: "Salesforce Case Account Number",
       },
+      contractNumber: {
+        type: Schema.types.string,
+      },
     },
     required: [],
   },
@@ -70,6 +73,7 @@ export default SlackFunction(
     let approvalStatus = "";
     let approvalNotes = "";
     let accountNumber = "";
+    let contractNumber = "";
     const query = `${CONST_VALUE.salesforceQuery}'${inputs.Id}' LIMIT 1`;
     console.log("Query: ", query);
     const authPayload = {
@@ -151,6 +155,8 @@ export default SlackFunction(
         caseDetails[0].Install_Time_Zone__c + ", " +
         caseDetails[0].Install_Tax_Jurisdiction__c).toString();
       console.log("Installation Address:", installAddress);
+      contractNumber = caseDetails[0].Contract_Number__c;
+      console.log("Contract Number: ", contractNumber);
     } catch (error) {
       console.error("We hit a snag. Error: ", error.message || error);
     }
@@ -165,6 +171,7 @@ export default SlackFunction(
         approvalStatus,
         approvalNotes,
         accountNumber,
+        contractNumber,
       },
     };
   },
