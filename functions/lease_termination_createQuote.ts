@@ -113,7 +113,7 @@ export default SlackFunction(
       firstEmptyRow = values.length + 2;
     }
     const sheetRange = `A${firstEmptyRow}:I${firstEmptyRow}`;
-    const quoteId = Number(inputs.caseNumber) + 1;
+    const quoteId = "Q-" + inputs.caseNumber;
     const insertRequest = await fetch(
       `${CONST_VALUE.googleSheetGeneralURL}${CONST_VALUE.googleSheetInvoiceID}/values/${encodedSheetName}!${sheetRange}?valueInputOption=RAW`,
       {
@@ -147,10 +147,7 @@ export default SlackFunction(
 
     console.log("Row inserted successfully:", insertResponse);
     const result =
-      `:tada: Termination Quote Created Successfully with Termination Quote Id: ${
-        Number(inputs.caseNumber) + 1
-      }.`;
-    const returnStringQuoteId = quoteId.toString();
-    return { outputs: { result, returnStringQuoteId } };
+      `:tada: Termination Quote Created Successfully with Termination Quote Id: ${quoteId}.`;
+    return { outputs: { result, quoteId } };
   },
 );
