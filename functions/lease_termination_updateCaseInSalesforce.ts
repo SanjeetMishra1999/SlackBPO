@@ -44,7 +44,7 @@ export default SlackFunction(
   async ({ inputs }) => {
     const updateEndpoint =
       `${CONST_VALUE.salesforceEndpointURLForCaseUpdate}${inputs.Id}`;
-    let result = "Failed to update Case Comments.";
+    let result = "Failed to update Case.";
     const authPayload = {
       grant_type: CONST_VALUE.salesforceGrantType,
       client_id: CONST_VALUE.salesforceClientId,
@@ -66,30 +66,39 @@ export default SlackFunction(
 
       const authData = await authResponse.json();
       const accessToken = authData.access_token;
+      console.log("accessToken: ", accessToken);
 
-      // Update the Case Comments
-      const updateResponse = await fetch(updateEndpoint, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          Case_Comments__c: inputs.comments,
-          Status: inputs.status,
-          Case_Approval__c: true,
-          Case_Approval_Status__c: inputs.status,
-          Case_Approval_Notes__c: inputs.comments,
-          Termination_Quote_Id__c: inputs.quoteId,
-          Contract_Number__c: inputs.contractNumber,
-        }),
-      });
+      console.log("updateEndpoint: ", updateEndpoint);
+      const updatePayload = {
+        Case_Comments__c: inputs.comments,
+        Status: inputs.status,
+        Case_Approval__c: true,
+        Case_Approval_Status__c: "Approved",
+        Case_Approval_Notes__c: inputs.comments,
+        Termination_Quote_Id__c: inputs.quoteId,
+        Contract_Number__c: inputs.contractNumber,
+      };
+      console.log("updatepayLoad: ", updatePayload);
 
-      if (updateResponse.ok) {
-        result = CONST_VALUE.salesforceCaseUpdated;
+      // Update the Case
+      try {
+        const updateResponse = await fetch(updateEndpoint, {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatePayload),
+        });
+        console.log("updateResponse: ", updateResponse);
+        if (updateResponse.ok) {
+          result = CONST_VALUE.salesforceCaseUpdated;
+        }
+      } catch (error) {
+        console.log("Error: : : ", error);
       }
     } catch (error) {
-      console.error("Error:", error.message || error);
+      console.error("Error:::", error.message || error);
     }
 
     return {

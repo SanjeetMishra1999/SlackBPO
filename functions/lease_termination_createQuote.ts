@@ -150,6 +150,7 @@ export default SlackFunction(
       `:tada: Termination Quote Created Successfully with Termination Quote Id: ${
         Number(inputs.caseNumber) + 1
       }.`;
-    return { outputs: { result, quoteId } };
+    const returnStringQuoteId = quoteId.toString();
+    return { outputs: { result, returnStringQuoteId } };
   },
 );
