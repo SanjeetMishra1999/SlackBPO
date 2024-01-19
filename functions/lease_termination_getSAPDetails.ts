@@ -9,7 +9,7 @@ export const GetSAPAddressFunctionDefinition = DefineFunction({
   input_parameters: {
     properties: {
       contractNumber: {
-        type: Schema.types.number,
+        type: Schema.types.string,
         description: "Contract Number",
       },
       googleAccessTokenId: {
