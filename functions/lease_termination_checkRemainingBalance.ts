@@ -121,17 +121,23 @@ export default SlackFunction(
     // Log the values to the console
     console.log("Values at the found index:", rowData);
     const balance = rowData[CONST_VALUE.rowDataIndexForBalance];
+    const exposureBalance = rowData[5];
+    console.log("exposureBalance: ", exposureBalance);
     console.log("Balance: ", balance);
+    let result = "";
 
-    if (balance !== "0") {
-      return {
-        error:
-          `We hit a snag. Case not eligible for Lease Termination due to ${balance} outstanding invoices.`,
-      };
+    if (balance === "0") {
+      result = ":tada: Selected Account (Contact Number: " +
+        inputs.contractNumber + " has no outstanding invoices. ";
+    } else {
+      result = ":tada: Selected Account (Contact Number: " +
+        inputs.contractNumber + " has outstanding invoices of " + balance +
+        ". ";
     }
 
-    const result =
-      `:tada: Selected account (Contract Number: ${inputs.contractNumber}) has no outstanding invoices. Please continue with creating Lease Termination Quote. :slightly_smiling_face:`;
+    result = result + "Also, the Exposure Amount is " + exposureBalance +
+      ". Please continue with creating Lease Termination Quote. :slightly_smiling_face:";
+
     return { outputs: { result } };
   },
 );

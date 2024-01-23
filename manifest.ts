@@ -7,12 +7,7 @@ import { UpdateCaseFunctionDefinition } from "./functions/lease_termination_upda
 import { InsertRecordFunctionDefinition } from "./functions/lease_termination_createQuote.ts";
 import { CheckBalanceFunctionDefinition } from "./functions/lease_termination_checkRemainingBalance.ts";
 import { GetQuoteIdFunctionDefinition } from "./functions/lease_termination_getQuoteId.ts";
-import { GetCaseDetailFunctionDefinition } from "./functions/address_update_getCaseDetails.ts";
-/**
- * The app manifest contains the app's configuration. This
- * file defines attributes like app name and description.
- * https://api.slack.com/automation/manifest
- */
+
 export default Manifest({
   name: "slack-bpo-lease-termination",
   description:
@@ -26,7 +21,6 @@ export default Manifest({
     InsertRecordFunctionDefinition,
     CheckBalanceFunctionDefinition,
     GetQuoteIdFunctionDefinition,
-    GetCaseDetailFunctionDefinition,
   ],
   outgoingDomains: [
     "servcloud--rtxpoc.sandbox.my.salesforce.com",

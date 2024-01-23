@@ -1,0 +1,12 @@
+{
+  "apps": {
+    "E06AU1U89HV": {
+      "app_id": "A06E9DCKWCX",
+      "enterprise_id": "E06AU1U89HV",
+      "IsDev": false,
+      "team_domain": "fy25acnbpo-sandbox",
+      "team_id": "E06AU1U89HV"
+    }
+  },
+  "default": "fy25acnbpo-sandbox"
+}
