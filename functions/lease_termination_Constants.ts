@@ -42,7 +42,9 @@ export const spreadsheetScope4 =
 export const googleInfoURL = "https://www.googleapis.com/oauth2/v1/userinfo";
 export const googleAccountAuth = "https://accounts.google.com/o/oauth2/auth";
 export const googleAccountToken = "https://oauth2.googleapis.com/token";
+//export const googleClientId =
+//  "164328133269-81d2hu0avu90jji63db1pgeluvhsh2m2.apps.googleusercontent.com";
 export const googleClientId =
-  "164328133269-81d2hu0avu90jji63db1pgeluvhsh2m2.apps.googleusercontent.com";
+  "571445607573-p30iehojbimukfkom69afcvdhbp4r7ki.apps.googleusercontent.com";
 export const googleSheetAccessType = "offline";
 export const googleSheetPrompt = "consent";

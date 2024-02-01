@@ -128,10 +128,10 @@ export default SlackFunction(
 
     if (balance === "0") {
       result = ":tada: Selected Account (Contact Number: " +
-        inputs.contractNumber + " has no outstanding invoices. ";
+        inputs.contractNumber + ") has no outstanding invoices. ";
     } else {
       result = ":tada: Selected Account (Contact Number: " +
-        inputs.contractNumber + " has outstanding invoices of " + balance +
+        inputs.contractNumber + ") has outstanding invoices of " + balance +
         ". ";
     }
 

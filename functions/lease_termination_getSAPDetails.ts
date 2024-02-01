@@ -55,11 +55,11 @@ export default SlackFunction(
     const auth = await client.apps.auth.external.get({
       external_token_id: inputs.googleAccessTokenId,
     });
-
+    console.log("auth: ", auth);
     if (!auth.ok) {
       return {
         error:
-          `We hit a sag. Failed to collect Google auth token: ${auth.error}`,
+          `We hit a snag. Failed to collect Google auth token: ${auth.error}`,
       };
     }
     const sheets = await fetch(CONST_VALUE.googleSheetURLToGetSAPData, {
